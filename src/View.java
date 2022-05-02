@@ -17,7 +17,7 @@ public class View extends JFrame {
 	
 	public View() {	
 	}
-	
+	//asdf
 	public void setupDisplay() {
 		this.setSize(new Dimension((int) width / 2, (int) height / 2));
 		this.setTitle("Canvas Painter");
