@@ -19,9 +19,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SpringLayout;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ColorUIResource;
@@ -30,6 +33,7 @@ import javax.swing.plaf.PanelUI;
 import java.awt.FlowLayout;
 import java.awt.BorderLayout;
 import java.net.URL;
+import java.nio.channels.NonReadableChannelException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -54,10 +58,12 @@ public class View extends JFrame implements MouseListener{
 	private ImageIcon[] icons = new ImageIcon[imgNum];
 	private URL[] iconURLs = new URL[imgNum];
 	private JMenu menu = new JMenu("Menu");
+	protected JMenuItem picImport = new JMenuItem("Import Picture");
 	private GridBagConstraints gbc = new GridBagConstraints();
 	private JSlider redSlider,greenSlider,blueSlider;
 	private static String[] toolNameStrings = { "Eraser", "Cutter", "Pencil", "Color Chooser", "Color Picker",
 			"Transform", "Picture", "Color Slider" };
+	JLabel imgLabel;
 
 	public View() {
 
@@ -73,10 +79,19 @@ public class View extends JFrame implements MouseListener{
 		this.add(panel);
 		this.add(buttonsPanel, BorderLayout.WEST);
 		this.setJMenuBar(menuBar);
+		try {
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		menu.add(picImport);
 		menuBar.add(menu);
 		buttonsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
+		
 		setupToolButtonSet();
+		new Controller().setupPicImportMenuAction(picImport, panel,imgLabel);
 		System.out.printf("JFrame width: %d and height: %d ", this.getWidth(), this.getHeight());
 		this.setVisible(true);
 	}
@@ -140,10 +155,6 @@ public class View extends JFrame implements MouseListener{
 		JButton colorDialogValidateButton = new JButton("Ok");
 		JDialog colorDialog = new JDialog(this, "Color Customization");
 		JSlider rSlider = new JSlider(0, 255), gSlider = new JSlider(0, 255), bSlider = new JSlider(0, 255);
-		colPre = colorPreviewPanel;
-		redSlider = rSlider;
-		greenSlider = gSlider;
-		blueSlider = bSlider;
 		colorDialog.setSize(new Dimension(400, 240));
 		colorDialog.add(westColorDialoguePanel, BorderLayout.WEST);
 		colorDialog.add(colorPreviewPanel, BorderLayout.CENTER);
@@ -171,4 +182,5 @@ public class View extends JFrame implements MouseListener{
 	protected JSlider getGSlider() {return greenSlider;}
 	protected JSlider getBSlider() {return blueSlider;}
 	protected JPanel getColPrevLab() {return colPre;}
+	
 }
