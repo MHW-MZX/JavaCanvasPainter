@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Robot;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -22,12 +23,17 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.text.AttributeSet.ColorAttribute;
-
+import java.awt.MouseInfo;
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.awt.Cursor;
+import java.awt.Point;
+import java.awt.Toolkit;
 
 /**
  * 
@@ -36,10 +42,15 @@ import java.io.IOException;
  */
 public class Controller extends View implements MouseListener, MouseMotionListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Graphics g;
 	private static Color drawColor;
 	private JLabel[] buttonLabels = getLabelSet();
 	private String[] labelNameStrings = getLabelNameArray();
+	private URL[] urlArray = getURLArray();
 	private final int ERASER = 0, CUTTER = 1, PENCIL = 2, COLOR_CHOOSER = 3, COLOR_PICKER = 4, TRANSFORM = 5,
 			PICTURE = 6, COLOR_SLIDER = 7;
 	private final Color defaultColor = new Color(0, 0, 0);
@@ -48,6 +59,7 @@ public class Controller extends View implements MouseListener, MouseMotionListen
 	private JSlider rSlider = super.getRSlider(), gSlider = super.getGSlider(), bSlider = super.getBSlider();
 	private JPanel colPreview = super.getColPrevLab();
 	private JLabel imgLb;
+	private Image image;
 
 	public Controller(View v, Model m) {
 		System.out.println("inside controller");
@@ -68,12 +80,10 @@ public class Controller extends View implements MouseListener, MouseMotionListen
 	public void mouseClicked(MouseEvent e) {
 
 		for (int i = 0; i < buttonLabels.length; i++) {
-			if (e.getSource() == buttonLabels[i]) {
-				System.out.printf("You clicked: %s\n", labelNameStrings[i]);
-			}
 
 			if (e.getSource() == buttonLabels[COLOR_CHOOSER]) {
 				// g.setColor();
+				System.out.printf("You clicked: %s\n", labelNameStrings[COLOR_CHOOSER]);
 				drawColor = JColorChooser.showDialog(this, "Select a color", Color.RED);
 				colorChanged = true;
 				break;
@@ -81,15 +91,73 @@ public class Controller extends View implements MouseListener, MouseMotionListen
 
 			if (e.getSource() == buttonLabels[ERASER]) {
 				currentTool = "eraser";
+				System.out.printf("You clicked: %s\n", labelNameStrings[COLOR_CHOOSER]);
+				break;
 			}
 
 			if (e.getSource() == buttonLabels[PENCIL]) {
 				currentTool = "pencil";
+				super.panel.setCursor(null);
+				System.out.printf("You clicked: %s\n", labelNameStrings[PENCIL]);
+				break;
 			}
 
 			if (e.getSource() == buttonLabels[COLOR_SLIDER]) {
-				super.displayColorSliderDialogue();
 				currentTool = "Color Slider";
+				super.displayColorSliderDialogue();
+				System.out.printf("You clicked: %s\n", labelNameStrings[COLOR_SLIDER]);
+				break;
+			}
+
+			if (e.getSource() == buttonLabels[COLOR_PICKER]) {
+				currentTool = "Color Picker";
+				// System.out.println(urlArray[0].toString());
+				System.out.printf("You clicked: %s", labelNameStrings[COLOR_PICKER]);
+				changeCursor(super.panel, buttonLabels[COLOR_PICKER], urlArray[COLOR_PICKER]);
+				super.panel.addMouseListener(new MouseListener() {
+
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						int xValue = MouseInfo.getPointerInfo().getLocation().x;
+						int yValue = MouseInfo.getPointerInfo().getLocation().y;
+						Robot robot;
+						try {
+							robot = new Robot();
+							Color color = robot.getPixelColor(xValue, yValue);
+							System.out.println(color);
+							panel.revalidate();
+						} catch (AWTException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						
+					}
+
+					@Override
+					public void mousePressed(MouseEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void mouseReleased(MouseEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void mouseEntered(MouseEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void mouseExited(MouseEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+				});
 				break;
 			}
 
@@ -239,19 +307,25 @@ public class Controller extends View implements MouseListener, MouseMotionListen
 	}
 
 	/**
-	public void paintComponent(Graphics g, JPanel p) {
-		JPanel temp;
-		temp = new JPanel(true) {
-			private static final long serialVersionUID = 1L;
-			@Override
-			 public void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                // do painting
-            }
+	 * public void paintComponent(Graphics g, JPanel p) { JPanel temp; temp = new
+	 * JPanel(true) { private static final long serialVersionUID = 1L;
+	 * 
+	 * @Override public void paintComponent(Graphics g) { super.paintComponent(g);
+	 *           // do painting }
+	 * 
+	 *           }; }
+	 **/
 
-		};
+	private void changeCursor(JPanel panel, JLabel newCursorImageLabel, URL iconURL) {
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		image = toolkit.getImage(iconURL);
+		System.out.println("\ninside changeCursor  " + iconURL.toString());
+		panel.setCursor(Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0, 0), "img"));
 	}
-	**/
+
+	public void getClickedComponentColor() {
+
+	}
 
 	private class drag {
 

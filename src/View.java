@@ -48,25 +48,25 @@ import java.awt.GridLayout;
 import java.awt.GridBagConstraints;
 
 public class View extends JFrame implements MouseListener{
-	private static int imgNum = new File("src//imgs").listFiles().length;
+	protected static int imgNum = new File("src//imgs").listFiles().length;
 	private Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private double width = screenSize.getWidth(), height = screenSize.getHeight();
-	public static JPanel panel = new JPanel();
+	protected static JPanel panel = new JPanel();
 	private JPanel buttonsPanel = new JPanel(), colPre = new JPanel();
 	private static JLabel[] toolsButtonSetIcons = new JLabel[imgNum];
 	private JMenuBar menuBar = new JMenuBar();
 	private ImageIcon[] icons = new ImageIcon[imgNum];
-	private URL[] iconURLs = new URL[imgNum];
-	private JMenu menu = new JMenu("Menu");
-	protected JMenuItem picImport = new JMenuItem("Import Picture");
+	protected static URL[] iconURLs = new URL[imgNum];
+	private JMenu menu = new JMenu("File"), edit = new JMenu("Edit");
+	protected JMenuItem picImport = new JMenuItem("Import Picture"), pencilSizeChangeMenu = new JMenuItem("Change Pen Size");
 	private GridBagConstraints gbc = new GridBagConstraints();
 	private JSlider redSlider,greenSlider,blueSlider;
+	URL[] tempURLArr;
 	private static String[] toolNameStrings = { "Eraser", "Cutter", "Pencil", "Color Chooser", "Color Picker",
-			"Transform", "Picture", "Color Slider" };
+			"Transform", "Picture", "Color Slider","Move" };
 	JLabel imgLabel;
-
+	
 	public View() {
-
 	}
 
 	public void setupDisplay() {
@@ -88,11 +88,12 @@ public class View extends JFrame implements MouseListener{
 		}
 		menu.add(picImport);
 		menuBar.add(menu);
+		menuBar.add(edit);
 		buttonsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
 		setupToolButtonSet();
 		new Controller().setupPicImportMenuAction(picImport, panel,imgLabel);
-		System.out.printf("JFrame width: %d and height: %d ", this.getWidth(), this.getHeight());
+		System.out.printf("JFrame width: %d and height: %d\n", this.getWidth(), this.getHeight());
 		this.setVisible(true);
 	}
 
@@ -149,6 +150,8 @@ public class View extends JFrame implements MouseListener{
 	protected static String[] getLabelNameArray() {
 		return toolNameStrings;
 	}
+	
+	protected static URL[] getURLArray() {return iconURLs;}
 
 	protected void displayColorSliderDialogue() {
 		JPanel colorDialogPanel = new JPanel(), westColorDialoguePanel = new JPanel(), colorPreviewPanel = new JPanel();
@@ -182,5 +185,9 @@ public class View extends JFrame implements MouseListener{
 	protected JSlider getGSlider() {return greenSlider;}
 	protected JSlider getBSlider() {return blueSlider;}
 	protected JPanel getColPrevLab() {return colPre;}
-	
+	protected ImageIcon [] getIconArray() {return icons;}
+
+	private class Panel extends JPanel {
+		
+	}
 }
